@@ -21,6 +21,5 @@ func main() {
 	implementation.Determine()
 	// data := newFile.CopyData()
 	// fmt.Println(data)
-
 }
 
