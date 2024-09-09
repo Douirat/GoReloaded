@@ -8,6 +8,30 @@ func PunctuationMark(r rune) bool {
 	return (r == '.' || r == ',' || r == '!' || r == '?' || r == ':' || r == ';')
 }
 
+// A function to make sure the if it is a special case (H):
+func IsSpecial(s string) bool {
+	special := []string{"Hour", "Honor", "Honest", "Heir"}
+}
+
+// A function to make sure my method is a vowel:
+func IsVowel(r roon) bool {
+	runes := a, e, i, o, u
+	for _, v := range runes {
+		if r == v {
+			return true
+		}
+	}
+	return false
+}
+
+// A function to handle the occurence of the a insted of an before a vowel in go:
+func Atoan (strs []string) []string {
+	for i :=0; i<len(strs); i++ {
+		if i+1 < len(strs) && strs[i] == "a" &&  str[i+1][0]
+	}
+	return strs
+}
+
 // Function to clean/clear my strings:
 func CleanStrings(slc []string) []string {
 	for i := 0; i < len(slc); i++ {
