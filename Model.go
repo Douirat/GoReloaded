@@ -12,42 +12,7 @@ type String struct {
 type Model interface {
 	// ConvertBase(n, bf, bt string) string
 	Filter()
-}
-
-// Function to clean/clear my strings:
-func cleanStrs(slc []string) []string {
-	// str := ""
-	for i := 0; i < len(slc); i++ {
-		if len(slc[i]) == 1 {
-			if PunctuationMark(rune(slc[i][0])) {
-				slc[i-1] += slc[i]
-				slc = append(slc[:i], slc[i+1:]...)
-
-			}
-		} else if len(slc[i]) > 1 {
-			j := 0
-			for _, v := range slc[i] {
-				if PunctuationMark(v) {
-					slc[i-1] += string(v)
-					j++
-					
-				} else if j < len(slc[i]) {
-					slc[i] = slc[i][j:]
-					j=0
-				}
-			}
-			if j >= len(slc[i]) {
-				slc = append(slc[:i], slc[i+1:]...)
-				continue
-			}
-		}
-	}
-	return slc
-}
-
-// A function to make sure if a character is a punctation mark:
-func PunctuationMark(r rune) bool {
-	return (r == '.' || r == ',' || r == '!' || r == '?' || r == ':' || r == ';')
+	HandleQuotes() []string
 }
 
 // Instantiate a new String object:
@@ -55,24 +20,43 @@ func NewString(s string) *String {
 	return &String{str: s}
 }
 
-// Filter the content of my string:
+// // A function to filter my functions:
 func (s *String) Filter() {
-	str := ""
-	slc_str := []string{}
-	for _, v := range s.str {
-		if v != ' ' {
-			str += string(v)
-		} else {
-			if str != "" {
-				slc_str = append(slc_str, str)
-				str = ""
+	required := s.HandleQuotes()
+	fmt.Println(required)
+}
+
+func (s *String) HandleQuotes() []string {
+	str := s.str
+	sub_str := ""
+	slc := []string{}
+	// flag := 0
+
+	for _, v := range str {
+		if v == 39 {
+			if sub_str != "" {
+				slc = append(slc, sub_str)
+				sub_str = ""
 			}
+
+			slc = append(slc, string(v))
+			continue
+		}
+		if v == 32 {
+			if sub_str != "" {
+				slc = append(slc, sub_str)
+				sub_str = ""
+			}
+			continue
+		} else {
+			sub_str += string(v)
 		}
 	}
-	if str != "" {
-		slc_str = append(slc_str, str)
-		str = ""
+	if sub_str != "" {
+		slc = append(slc, sub_str)
+		sub_str = ""
 	}
-	slc := cleanStrs(slc_str)
-	fmt.Println(slc)
+	
+	fmt.Println(Quoting(slc))
+	return slc
 }
