@@ -1,48 +1,38 @@
-package reload
+package Reload
 
-import (
-	"io"
-	"os"
-)
+import "os"
 
-// Declare a new file object
+// Declare a file object:
 type File struct {
-	Name string
-	Content string
+	Name, Content string
 }
 
-// Instantiate a new object:
-type Filer interface {
-	WriteInto()
-	CopyData() string
+// Instantiate the file object:
+func NewFile(name, content string) *File {
+	new_file := new(File)
+	new_file.Name = name
+	new_file.Content = content
+	return new_file
 }
 
-// A function to instantiate a new file in go:
-func NewFile(fn, cont string) *File {
-	return &File{Name: fn, Content: cont}
-}
-
-// A Method to create and insert data into a file:
-func (f *File) WriteInto() {
-	// Create a file using the OS package:
-	file, err := os.Create(f.Name)
-	HandleNilError(err)
-	_, Err := io.WriteString(file, f.Content)
-	HandleNilError(Err)
-	defer file.Close()
-}
-
-// Write a Method to read data from a file:
-func (f *File)CopyData() string {
-	data, err := os.ReadFile(f.Name)
-	HandleNilError(err)
-	return string(data)
-}
-
-// A funnction to handle nil errors:
-func HandleNilError(err error) {
+// Read data from an existing new file:
+func (file *File) Read() {
+	data, err := os.ReadFile(file.Name)
 	if err != nil {
 		panic(err)
 	}
+	file.Content = string(data)
 }
 
+// Create a result new file or overwrite an existing with a result extracted from the sample file:
+func (file *File) CopyData() {
+	f, err := os.Create(file.Name)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	_, Err := f.WriteString(file.Content)
+	if Err != nil {
+		panic(Err)
+	}
+}
