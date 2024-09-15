@@ -168,66 +168,149 @@ func (line *Line) handlePunctution() {
 	line.String = *result
 }
 
-// A function to make sure if a character is a punctation mark:
-// Relates to the organize quotes function
-func PunctuationMark(r rune) bool {
-	return (r == '.' || r == ',' || r == '!' || r == '?' || r == ':' || r == ';')
-}
+// // A function to make sure if a character is a punctation mark:
+// // Relates to the organize quotes function
+// func PunctuationMark(r rune) bool {
+// 	return (r == '.' || r == ',' || r == '!' || r == '?' || r == ':' || r == ';')
+// }
 
-// A func tion to make sure either a char is an alfanumeric or not:
-// Relates to the organize quotes function
-func IsAlfa(r rune) bool {
-	return r >= 65 && r <= 90 || r >= 97 && r <= 122 || r >= 48 && r <= 57 || PunctuationMark(r)
-}
+// // A func tion to make sure either a char is an alfanumeric or not:
+// // Relates to the organize quotes function
+// func IsAlfa(r rune) bool {
+// 	return r >= 65 && r <= 90 || r >= 97 && r <= 122 || r >= 48 && r <= 57 || PunctuationMark(r)
+// }
 
-// A function to handle the quotes
-func (line *Line) organizeQuotes() {
-	str := line.String
-	s := ""
-	within := false
-	pass := false
-	for i, char := range str {
-		if char == 39 {
-			if !within {
-				within = true
-				if i > 0 && IsAlfa(rune(str[i-1])) && i < len(str)-1 && IsAlfa(rune(str[i+1])) {
-					within = false
-					s += string(char)
-					continue
-				}
-				// fmt.Println("we are within the quotes")
-			} else {
-				within = false
-				if i > 0 && IsAlfa(rune(str[i-1])) && i < len(str)-1 && IsAlfa(rune(str[i+1])) {
-					within = true
-					s += string(char)
-					continue
-				}
-				// fmt.Println("we are getting out!!!")
+// // A function to handle the quotes
+// func (line *Line) organizeQuotes() {
+// 	str := line.String
+// 	s := ""
+// 	within := false
+// 	pass := false
+// 	for i, char := range str {
+// 		if char == 39 {
+// 			if !within {
+// 				within = true
+// 				if i > 0 && IsAlfa(rune(str[i-1])) && i < len(str)-1 && IsAlfa(rune(str[i+1])) {
+// 					within = false
+// 					s += string(char)
+// 					continue
+// 				}
+// 				// fmt.Println("we are within the quotes")
+// 			} else {
+// 				within = false
+// 				if i > 0 && IsAlfa(rune(str[i-1])) && i < len(str)-1 && IsAlfa(rune(str[i+1])) {
+// 					within = true
+// 					s += string(char)
+// 					continue
+// 				}
+// 				// fmt.Println("we are getting out!!!")
+// 			}
+// 		}
+// 		if within {
+// 			if char == 32 && IsAlfa(rune(str[i-1])) && IsAlfa(rune(str[i+1])) {
+// 				pass = true
+// 			} else if char == 32 && !IsAlfa(rune(str[i-1])) && IsAlfa(rune(str[i+1])) {
+// 				pass = false
+// 			} else if char == 32 && IsAlfa(rune(str[i-1])) && !IsAlfa(rune(str[i+1])) {
+// 				pass = false
+// 			}
+// 		}
+// 		// if within && pass && char == 32 {
+// 		// 	// fmt.Println(char)
+// 		// } else if within && char == 32 {
+// 		// 	// fmt.Println("-----")
+// 		// } else if within {
+// 		// 	// fmt.Println("<><><><>")
+// 		// }
+// 		if within && !pass && char == 32 {
+// 			continue
+// 		}
+// 		s += string(char)
+// 	}
+// 	line.String = s
+// }
+
+
+// Trim excesses in white spaces:
+func  trimStr(s string) string {
+	// if s == " " || s == ""{
+	// 	return ""
+	// }
+	if s == " " {
+		return " "
+	} else if s == "" {
+		return ""
+	}
+	str := ""
+	slc := []string{}
+	for _, char := range s {
+		if char == 32 || char == 9 {
+			if str != "" {
+				slc = append(slc, str)
+				str = ""
 			}
-		}
-		if within {
-			if char == 32 && IsAlfa(rune(str[i-1])) && IsAlfa(rune(str[i+1])) {
-				pass = true
-			} else if char == 32 && !IsAlfa(rune(str[i-1])) && IsAlfa(rune(str[i+1])) {
-				pass = false
-			} else if char == 32 && IsAlfa(rune(str[i-1])) && !IsAlfa(rune(str[i+1])) {
-				pass = false
-			}
-		}
-		// if within && pass && char == 32 {
-		// 	// fmt.Println(char)
-		// } else if within && char == 32 {
-		// 	// fmt.Println("-----")
-		// } else if within {
-		// 	// fmt.Println("<><><><>")
-		// }
-		if within && !pass && char == 32 {
 			continue
 		}
-		s += string(char)
+		str += string(char)
 	}
-	line.String = s
+	if str != "" {
+		slc = append(slc, str)
+		str = ""
+	}
+	result := slc[0]
+	for i, word := range slc {
+		if i != 0 {
+			result += " " + word
+		}
+	}
+	return result
+}
+
+
+func (line *Line) organizeQuotes() {
+s := trimStr(line.String)
+fmt.Println(s)
+slc := []string{}
+Quoted := false
+start := 0
+end := 0
+for i, char := range s {
+	if char == 39 {
+		if !Quoted {
+			Quoted = true
+			// if start == 0 && i == 0 {
+			// 	start = i
+			// 	continue
+			// }
+			start = i
+			slc = append(slc, s[end:start])
+			continue
+		} else if Quoted {
+			Quoted = false
+			end = i+1
+			slc = append(slc, s[start:end])
+		}
+	}
+}
+if end < len(s) {
+	slc = append(slc, s[end:])
+}
+
+
+for i, word := range slc{
+if len(word) > 1 {
+	if rune(word[0]) == 39 && rune(word[len(word)-1]) == 39 {
+		slc[i] = "'" + trimStr(word[1:len(word)-1]) + "'"
+	}
+}
+}
+result := slc[0]
+for j, v := range  slc {
+	if j != 0 {
+		result += v
+	}
+}
+line.String = result
 }
 
 // A function to make sure my method is a vowel:
