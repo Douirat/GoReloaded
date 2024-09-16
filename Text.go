@@ -109,7 +109,7 @@ func (line *Line) TrimExcessSpaces() {
 		slc = append(slc, str)
 		str = ""
 	}
-	
+
 	if len(slc) == 0 {
 		line.String = ""
 		return
@@ -330,7 +330,7 @@ func (line *Line) organizeQuotes() {
 // A function to make sure my method is a vowel:
 // Related to a to an method
 func IsVowel(r rune) bool {
-	runes := "aAeEiIoOuU"
+	runes := "aAeEiIoOuUhH"
 	for _, v := range runes {
 		if r == v {
 			return true

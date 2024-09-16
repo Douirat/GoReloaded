@@ -1,8 +1,9 @@
 package Reload
 
-import "fmt"
-
-// import "fmt"
+import (
+	"fmt"
+	"unicode"
+)
 
 // => functions to determine the type of the charcters:
 // Is lower case?
@@ -47,7 +48,7 @@ func Atoi(str string) int {
 func IsValidBase(n, base string) bool {
 	Chosen := map[rune]bool{}
 	if base == "01" {
-		Chosen = map[rune]bool{48: true, 49: true }
+		Chosen = map[rune]bool{48: true, 49: true}
 	} else {
 		Chosen = map[rune]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true, 65: true, 66: true, 67: true, 68: true, 69: true, 70: true}
 	}
@@ -59,21 +60,40 @@ func IsValidBase(n, base string) bool {
 	return true
 }
 
+// Check the form of my string if upper case or not:
+func UpperCase(word string) bool {
+	// Convert the word to runes to handle Unicode characters correctly
+	runes := []rune(word)
+	for _, r := range runes {
+		// If any rune is not uppercase and not a space, return false
+		if !unicode.IsUpper(r) && unicode.IsLetter(r) {
+			return false
+		}
+	}
+	return true
+}
+
 // Convert from a base to another:
 func ConvertBase(nbr, from, to string) string {
 	var num string
 	negative := false
+
 	if rune(nbr[0]) == 45 {
 		negative = true
 		num = nbr[1:]
 	} else {
 		num = nbr
 	}
-	fmt.Println(num)
-	fmt.Println(negative)
-	if !IsValidBase(num, from) {
+
+	if rune(nbr[0]) == 43 {
+		num = nbr[1:]
+	}
+
+	if !IsValidBase(ToUpperCase(num), from) {
 		return nbr
 	}
+	num = ToUpperCase(num)
+	fmt.Println(num)
 	n := 0
 	for _, v := range num {
 		for i := range from {
@@ -99,58 +119,68 @@ func ConvertBase(nbr, from, to string) string {
 
 // make sure the string is a flag:
 // A function to capitalize a string:
+// func Capitalize(word string) string {
+// 	str := ""
+// 	changed := false
+// 	edge := 1
+// for i:=0; i<len(word); i++ {
+// 	if isLowerCase(rune(word[i])) && isLetter(rune(word[i])) {
+// 		str += string(rune(word[i]) - 32)
+// 		changed = true
+// 	}
+// 	if changed {
+// 		break
+// 	}
+// 	if isLetter(rune(word[i])) {
+// 		return word
+// 	}
+// 	str += string(rune(word[i]))
+// 	edge++
+// }
+// if changed {
+// 	if edge < len(word) {
+// 	 str += word[edge:]
+// 	}
+// 	return str
+// }
+// return word
+// }
+
 func Capitalize(word string) string {
-	str := ""
-	changed := false
-	edge := 1
-for i:=0; i<len(word); i++ {
-	if isLowerCase(rune(word[i])) && isLetter(rune(word[i])) {
-		str += string(rune(word[i]) - 32)
-		changed = true
-	}
-	if changed {
-		break
-	}
-	if isLetter(rune(word[i])) {
+	// Convert the word to runes to handle Unicode characters correctly
+	runes := []rune(word)
+	if len(runes) == 0 {
 		return word
 	}
-	str += string(rune(word[i]))
-	edge++
-}
-if changed {
-	if edge < len(word) {
-	 str += word[edge:]
+	// Capitalize the first rune
+	runes[0] = unicode.ToUpper(runes[0])
+	// Lowercase the rest of the runes
+	for i := 1; i < len(runes); i++ {
+		runes[i] = unicode.ToLower(runes[i])
 	}
-	return str
+	return string(runes)
 }
-return word
-}
-
 
 // A function to convert a string to upper case:
-func ToUpperCase(str string) string {
-	sub_str := ""
-	for _, v := range str {
-		if isLowerCase(v) {
-			sub_str += string(v - 32)
-			continue
-		}
-		sub_str += string(v)
+func ToUpperCase(word string) string {
+	// Convert the word to runes to handle Unicode characters correctly
+	runes := []rune(word)
+	// Convert all runes to lowercase
+	for i, r := range runes {
+		runes[i] = unicode.ToUpper(r)
 	}
-	return sub_str
+	return string(runes)
 }
 
 // A function to convert a string to lowercase:
-func ToLowerCase(str string) string {
-	sub_str := ""
-	for _, v := range str {
-		if isUpperCase(v) {
-			sub_str += string(v + 32)
-			continue
-		}
-		sub_str += string(v)
+func ToLowerCase(word string) string {
+	// Convert the word to runes to handle Unicode characters correctly
+	runes := []rune(word)
+	// Convert all runes to lowercase
+	for i, r := range runes {
+		runes[i] = unicode.ToLower(r)
 	}
-	return sub_str
+	return string(runes)
 }
 
 // make changes on a string based on the adequat flag:
@@ -216,7 +246,6 @@ func (line *Line) HandleFlags() {
 			}
 			if i < len(slc)-1 && rune(slc[i+1][len(slc[i+1])-1]) == 41 && isNumber(rune(slc[i+1][0])) {
 				ind := Atoi(slc[i+1][:len(slc[i+1])-1])
-				// fmt.Println(ind)
 				j := i
 				for j > 0 && ind > 0 {
 					slc[j-1] = ToUpperCase(slc[j-1])
@@ -268,7 +297,7 @@ func (line *Line) HandleFlags() {
 		case "(hex)":
 			if i < len(slc) {
 				if i > 0 {
-					slc[i-1] = ConvertBase(ToUpperCase(slc[i-1]), "0123456789ABCDEF", "0123456789")
+					slc[i-1] = ConvertBase(slc[i-1], "0123456789ABCDEF", "0123456789")
 				}
 				slc = append(slc[:i], slc[i+1:]...)
 				i = 0
@@ -288,7 +317,6 @@ func (line *Line) HandleFlags() {
 		line.String = ""
 		return
 	}
-	// fmt.Println(slc)
 	result := new(string)
 	*result = slc[0]
 	for i, sub := range slc {
