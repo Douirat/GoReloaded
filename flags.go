@@ -1,5 +1,7 @@
 package Reload
 
+// import "fmt"
+
 // => functions to determine the type of the charcters:
 // Is lower case?
 func isLowerCase(r rune) bool {
@@ -39,8 +41,27 @@ func Atoi(str string) int {
 	return x * y
 }
 
+// Check the base if valid:
+func IsValidBase(n, base string) bool {
+	Chosen := map[rune]bool{}
+	if base == "01" {
+		Chosen = map[rune]bool{48: true, 49: true }
+	} else {
+		Chosen = map[rune]bool{48: true, 49: true, 50: true, 51: true, 52: true, 53: true, 54: true, 55: true, 56: true, 57: true, 65: true, 66: true, 67: true, 68: true, 69: true, 70: true}
+	}
+	for _, b := range n {
+		if !Chosen[b] {
+			return false
+		}
+	}
+	return true
+}
+
 // Convert from a base to another:
 func ConvertBase(nbr, from, to string) string {
+	if !IsValidBase(nbr, from) {
+		return nbr
+	}
 	n := 0
 	for _, v := range nbr {
 		for i := range from {
@@ -49,6 +70,9 @@ func ConvertBase(nbr, from, to string) string {
 				n += i
 			}
 		}
+	}
+	if n == 0 {
+		return "0"
 	}
 	str := ""
 	for n > 0 {
@@ -100,7 +124,6 @@ func ToLowerCase(str string) string {
 	return sub_str
 }
 
-
 // make changes on a string based on the adequat flag:
 func (line *Line) HandleFlags() {
 	slc := []string{}
@@ -119,9 +142,12 @@ func (line *Line) HandleFlags() {
 		slc = append(slc, s)
 		s = ""
 	}
-	for i, word := range slc {
-		switch word {
+	for i := 0; i < len(slc); i++ {
+		switch slc[i] {
 		case "(cap,":
+			if len(slc) == 1 {
+				break
+			}
 			if i < len(slc)-1 && rune(slc[i+1][len(slc[i+1])-1]) == 41 && isNumber(rune(slc[i+1][0])) {
 				ind := Atoi(slc[i+1][:len(slc[i+1])-1])
 				j := i
@@ -132,9 +158,14 @@ func (line *Line) HandleFlags() {
 				}
 				slc = append(slc[:i], slc[i+1:]...)
 				slc = append(slc[:i], slc[i+1:]...)
+				i = 0
+
 			}
 
 		case "(low,":
+			if len(slc) == 1 {
+				break
+			}
 			if i < len(slc)-1 && rune(slc[i+1][len(slc[i+1])-1]) == 41 && isNumber(rune(slc[i+1][0])) {
 				ind := Atoi(slc[i+1][:len(slc[i+1])-1])
 				// fmt.Println(ind)
@@ -146,9 +177,14 @@ func (line *Line) HandleFlags() {
 				}
 				slc = append(slc[:i], slc[i+1:]...)
 				slc = append(slc[:i], slc[i+1:]...)
+				i = 0
+
 			}
 
 		case "(up,":
+			if len(slc) == 1 {
+				break
+			}
 			if i < len(slc)-1 && rune(slc[i+1][len(slc[i+1])-1]) == 41 && isNumber(rune(slc[i+1][0])) {
 				ind := Atoi(slc[i+1][:len(slc[i+1])-1])
 				// fmt.Println(ind)
@@ -160,21 +196,33 @@ func (line *Line) HandleFlags() {
 				}
 				slc = append(slc[:i], slc[i+1:]...)
 				slc = append(slc[:i], slc[i+1:]...)
+				i = 0
+
 			}
 		case "(low)":
+			if len(slc) == 1 {
+				break
+			}
 			if i < len(slc) {
 				if i > 0 {
 					slc[i-1] = ToLowerCase(slc[i-1])
 				}
 				slc = append(slc[:i], slc[i+1:]...)
+				i = 0
+
 			}
 
 		case "(up)":
+			if len(slc) == 1 {
+				break
+			}
 			if i < len(slc) {
 				if i > 0 {
 					slc[i-1] = ToUpperCase(slc[i-1])
 				}
 				slc = append(slc[:i], slc[i+1:]...)
+				i = 0
+
 			}
 
 		case "(cap)":
@@ -183,6 +231,8 @@ func (line *Line) HandleFlags() {
 					slc[i-1] = Capitalize(slc[i-1])
 				}
 				slc = append(slc[:i], slc[i+1:]...)
+				i = 0
+
 			}
 		case "(hex)":
 			if i < len(slc) {
@@ -190,6 +240,7 @@ func (line *Line) HandleFlags() {
 					slc[i-1] = ConvertBase(slc[i-1], "0123456789ABCDEF", "0123456789")
 				}
 				slc = append(slc[:i], slc[i+1:]...)
+				i = 0
 			}
 		case "(bin)":
 			if i < len(slc) {
@@ -197,9 +248,14 @@ func (line *Line) HandleFlags() {
 					slc[i-1] = ConvertBase(slc[i-1], "01", "0123456789")
 				}
 				slc = append(slc[:i], slc[i+1:]...)
+				i = 0
 			}
 
 		}
+	}
+	if len(slc) == 0 {
+		line.String = ""
+		return
 	}
 	// fmt.Println(slc)
 	result := new(string)

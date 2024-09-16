@@ -23,6 +23,7 @@ func main() {
 		if validArgs(arguments) {
 			file_sample := Reload.NewFile("../"+arguments[0], "")
 			file_sample.Read()
+			fmt.Println(file_sample.Content)
 			if len(file_sample.Content) < 1 {
 				fmt.Println("Your file is empty!")
 				return
@@ -30,13 +31,13 @@ func main() {
 				Data := Reload.NewInput(file_sample.Content)
 				new_text := Reload.NewText()
 				new_text.DivideInput(Data)
+				new_text.First.Display()
 				if new_text.IsEmpty() {
 					fmt.Println("Not enough arguments!!!")
 				} else {
 					new_text.RockAndRoll()
 					text := new_text.First.Dequeue()
 					result_file := Reload.NewFile("../result.Text", text)
-					fmt.Println(result_file.Content)
 					result_file.CopyData()
 					fmt.Println(new_text.Size)
 				}
