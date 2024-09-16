@@ -109,12 +109,19 @@ func (line *Line) TrimExcessSpaces() {
 		slc = append(slc, str)
 		str = ""
 	}
-	result := slc[0]
+	
+	if len(slc) == 0 {
+		line.String = ""
+		return
+	}
+	
+	result := slc[0] 
 	for i, word := range slc {
 		if i != 0 {
 			result += " " + word
 		}
 	}
+	fmt.Println(result)
 	line.String = result
 }
 
@@ -362,9 +369,11 @@ func (line *Line) AToAn() {
 		slc = append(slc, str)
 		str = ""
 	}
-	for i := 0; i < len(slc); i++ {
+	fmt.Println(slc)
+	for i := 0; i < len(slc)-1; i++ {
+		fmt.Println(slc[i])
 		if slc[i] == "a" || slc[i] == "A" {
-			if i < len(slc)-1 && IsVowel(rune(slc[i+1][0])) || IsSpecial(slc[i+1]) {
+			if IsVowel(rune(slc[i+1][0])) || IsSpecial(slc[i+1]) {
 				if slc[i] == "a" {
 					slc[i] = "an"
 				} else {
@@ -406,11 +415,12 @@ func (text *Text) RockAndRoll() {
 	for temp != nil {
 		if temp.String != "" {
 			temp.TrimExcessSpaces()
+			temp.organizeQuotes()
 			temp.HandleFlags()
 			temp.handlePunctution()
-			temp.organizeQuotes()
+			// temp.organizeQuotes()
 			temp.AToAn()
-			// temp.HandleFlags()
+			temp.HandleFlags()
 			temp.AddSpace()
 			temp = temp.Next
 		} else {

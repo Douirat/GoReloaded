@@ -1,5 +1,7 @@
 package Reload
 
+import "fmt"
+
 // import "fmt"
 
 // => functions to determine the type of the charcters:
@@ -59,11 +61,21 @@ func IsValidBase(n, base string) bool {
 
 // Convert from a base to another:
 func ConvertBase(nbr, from, to string) string {
-	if !IsValidBase(nbr, from) {
+	var num string
+	negative := false
+	if rune(nbr[0]) == 45 {
+		negative = true
+		num = nbr[1:]
+	} else {
+		num = nbr
+	}
+	fmt.Println(num)
+	fmt.Println(negative)
+	if !IsValidBase(num, from) {
 		return nbr
 	}
 	n := 0
-	for _, v := range nbr {
+	for _, v := range num {
 		for i := range from {
 			if rune(from[i]) == v {
 				n *= len(from)
@@ -79,24 +91,41 @@ func ConvertBase(nbr, from, to string) string {
 		str = string(rune(to[n%len(to)])) + str
 		n /= len(to)
 	}
+	if negative {
+		str = "-" + str
+	}
 	return str
 }
 
 // make sure the string is a flag:
 // A function to capitalize a string:
 func Capitalize(word string) string {
-	var str string
+	str := ""
 	changed := false
-	if isLowerCase(rune(word[0])) && isLetter(rune(word[0])) {
-		str += string(rune(word[0]) - 32)
+	edge := 1
+for i:=0; i<len(word); i++ {
+	if isLowerCase(rune(word[i])) && isLetter(rune(word[i])) {
+		str += string(rune(word[i]) - 32)
 		changed = true
 	}
 	if changed {
-		str += word[1:]
-		return str
+		break
 	}
-	return word
+	if isLetter(rune(word[i])) {
+		return word
+	}
+	str += string(rune(word[i]))
+	edge++
 }
+if changed {
+	if edge < len(word) {
+	 str += word[edge:]
+	}
+	return str
+}
+return word
+}
+
 
 // A function to convert a string to upper case:
 func ToUpperCase(str string) string {
@@ -201,6 +230,7 @@ func (line *Line) HandleFlags() {
 			}
 		case "(low)":
 			if len(slc) == 1 {
+				slc = []string{}
 				break
 			}
 			if i < len(slc) {
@@ -214,6 +244,7 @@ func (line *Line) HandleFlags() {
 
 		case "(up)":
 			if len(slc) == 1 {
+				slc = []string{}
 				break
 			}
 			if i < len(slc) {
@@ -237,7 +268,7 @@ func (line *Line) HandleFlags() {
 		case "(hex)":
 			if i < len(slc) {
 				if i > 0 {
-					slc[i-1] = ConvertBase(slc[i-1], "0123456789ABCDEF", "0123456789")
+					slc[i-1] = ConvertBase(ToUpperCase(slc[i-1]), "0123456789ABCDEF", "0123456789")
 				}
 				slc = append(slc[:i], slc[i+1:]...)
 				i = 0
