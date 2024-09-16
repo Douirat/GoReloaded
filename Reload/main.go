@@ -35,7 +35,7 @@ func main() {
 				} else {
 					new_text.RockAndRoll()
 					text := new_text.First.Dequeue()
-					result_file := Reload.NewFile("../result.Text", text)
+					result_file := Reload.NewFile("../result.txt", text)
 					fmt.Println(result_file.Content)
 					result_file.CopyData()
 					fmt.Println(new_text.Size)
