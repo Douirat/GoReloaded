@@ -418,10 +418,10 @@ func (text *Text) RockAndRoll() {
 			temp.organizeQuotes()
 			temp.HandleFlags()
 			temp.handlePunctution()
-			// temp.organizeQuotes()
 			temp.AToAn()
 			temp.HandleFlags()
 			temp.AddSpace()
+			temp.organizeQuotes()
 			temp = temp.Next
 		} else {
 			fmt.Println("Not enough arguments!!!")
